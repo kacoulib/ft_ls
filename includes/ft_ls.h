@@ -53,13 +53,11 @@ typedef struct		s_master
 	struct s_file	*errors;
 }					t_master;
 
-extern char *g_flags;
-
 int					ft_check_flag(char c);
 int					ft_display_color(t_file *file);
 int					ft_display_folder_files(t_file *folder, int l_len[]);
-int					ft_display_result(t_file *file, int l_len[],
-	int is_multiple_folder, int is_first);
+int					ft_display_result(t_file *file, int l_len[], int is_multi,
+	int is_first);
 t_master			*ft_get_or_create_master(void);
 
 t_file				*ft_init_folder(char *name, t_file *parent, t_file *prev);
@@ -73,14 +71,12 @@ int					ft_rev_file(t_file **file);
 int					ft_rev_list(t_file **file);
 int					ft_set_error(t_file *file, char *s, char *type);
 int					ft_set_extra_info(t_file *file, int l_len[]);
-int					ft_set_flags(t_master *master, t_file *file, char **av, int i);
-
+int					ft_set_flags(t_master *master, t_file *file, char **av,
+	int i);
 int					ft_sort_params(char **av, int i);
-int						set_parse_params(t_file *master, char **av,
+int					set_parse_params(t_file *master, char **av,
 	int l_len[], int i);
 int					ft_set_sb_and_long(t_file *file, int l_len[]);
-
-
 int					ft_sort_settings(t_file **file);
 int					ft_sort_by_last_modify(t_file **file);
 int					ft_sort_lexico(t_file **file);
@@ -88,7 +84,5 @@ int					ft_swap_file(t_file **file, t_file *current,
 	t_file *tmp);
 int					ft_push_file(t_file *head, t_file *file);
 int					ft_display_errors(t_file *file);
-int					update_screen_info(void);
-int					update_master_info(void);
 
 #endif
