@@ -12,7 +12,53 @@
 
 #include "ft_ls.h"
 
-int			ft_display_errors(t_file *file)
+static int		ft_display_single(t_file *file, int l_len[])
+{
+	int			i;
+	char		*tmp;
+
+	if (ft_check_flag('l') && file->type != -1)
+	{
+		i = -1;
+		while (file->l[++i] && l_len[i])
+		{
+			if (i == 4)
+				tmp = ft_padding(file->l[i],
+					(l_len[i] - ft_strlen(file->l[i])) + 1, 'r');
+			else
+				tmp = ft_padding(file->l[i],
+					(l_len[i] - ft_strlen(file->l[i])) + 1, 'l');
+			ft_putstr(ft_strjoin(tmp, " "));
+		}
+	}
+	ft_display_color(file);
+	return (1);
+}
+
+static int		ft_display_all_in_folder(t_file *file, int l_len[])
+{
+	while (file && ft_display_single(file, l_len))
+		file = file->next;
+	return (1);
+}
+
+int				ft_display_folder_files(t_file *folder, int l_len[])
+{
+	t_file		*tmp;
+	int			i;
+
+	tmp = folder;
+	i = 0;
+	while (tmp)
+	{
+		if (tmp->type != 4 && ++i)
+			ft_display_single(tmp, l_len);
+		tmp = tmp->next;
+	}
+	return (i);
+}
+
+int				ft_display_errors(t_file *file)
 {
 	if (!file || !file->errors)
 		return (1);
@@ -25,61 +71,29 @@ int			ft_display_errors(t_file *file)
 	return (1);
 }
 
-int			ft_display_recursive(t_file *file, int l_len[], int is_multi,
-	int first)
+int				ft_display_result(t_file *file, int l_len[], int is_multi,
+	int is_first)
 {
-	int		i;
-	t_file	*tmp;
-
-	if (!(tmp = file))
-		return (0);
-	i = -1;
-	while (tmp)
+	ft_sort_settings(&file->files);
+	if (!ft_check_flag('R'))
 	{
-		if (++i > -1 && tmp->type == 4)
-		{
-			if ((ft_strcmp(tmp->name, ".") != 0 && ft_strcmp(tmp->name, "..")
-				!= 0) || (first))
-			{
-				if (is_multi)
-					ft_print(first && i == 0 ? "" : "\n", tmp->path, ":", NULL);
-				if (ft_indexof(g_flags, 'l') > -1 && tmp->files)
-					ft_print("total ", ft_itoa(tmp->size), NULL, NULL);
-				ft_display_folder(tmp->files, l_len);
-			}
-			ft_display_errors(tmp);
-			ft_display_recursive(tmp->files, l_len, 1, 0);
-		}
-		tmp = tmp->next;
-	}
-	return (1);
-}
-
-int			ft_display_result(t_file *file, int l_len[], int i, int is_multi)
-{
-	t_file	*tmp;
-
-	if (!(tmp = file))
-		return (0);
-	i = ft_display_folder_files(tmp, l_len);
-	if (ft_indexof(g_flags, 'R') < 0)
-	{
-		while (tmp)
-		{
-			if (tmp->type == 4)
-			{
-				if (++i > 1)
-					ft_putchar('\n');
-				if (is_multi)
-					ft_print(tmp->path, ":", NULL, NULL);
-				if (ft_indexof(g_flags, 'l') > -1)
-					ft_print("total ", ft_itoa(tmp->size), NULL, NULL);
-				ft_display_folder(tmp->files, l_len);
-			}
-			tmp = tmp->next;
-		}
+		if (is_multi && file->prev)
+			ft_putchar('\n');
+		if (is_multi)
+			ft_print(file->path, ":", NULL, NULL);
+		if (ft_check_flag('l'))
+			ft_print("total ", ft_itoa(file->size), NULL, NULL);
 	}
 	else
-		ft_display_recursive(file, l_len, is_multi, 1);
+	{
+		if (!is_first)
+			ft_putchar('\n');
+		if (!is_first || is_multi)
+			ft_print(file->path, ":", NULL, NULL);
+		if (ft_check_flag('l') && file->files)
+			ft_print("total ", ft_itoa(file->size), NULL, NULL);
+	}
+	ft_display_errors(file);
+	ft_display_all_in_folder(file->files, l_len);
 	return (1);
 }

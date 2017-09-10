@@ -87,11 +87,11 @@ int			ft_sort_settings(t_file **folder)
 
 	if (!folder || !(*folder))
 		return (0);
-	if (ft_indexof(g_flags, 't') >= 0)
+	if (ft_check_flag('t'))
 		ft_sort_by_last_modify(folder);
 	else
 		ft_sort_lexico(folder);
-	if (ft_indexof(g_flags, 'r') >= 0)
+	if (ft_check_flag('r'))
 		ft_rev_file(folder);
 	tmp = *folder;
 	while (tmp)

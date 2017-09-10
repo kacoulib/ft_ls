@@ -10,41 +10,43 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME    	=   ft_ls
-CC      	=   gcc
-RM      	=   rm -f
-CFLAGS  	=  -Wall -Werror -Wextra
-LIB			=	-L./lib/libft -lft
-CPPFLAGS	= 	-Iincludes
-SRCS		=	src/ft_setting_0.c \
+NAME		=	ft_ls
+CC			=	gcc
+RM			=	rm -f
+CFLAGS		=	-Wall -Werror -Wextra
+LIB			=	-L./lib/libft -lft -lncurses
+CPPFLAGS	=	-Iincludes
+SRCS		=	src/ft_init.c \
+				src/ft_setting_0.c \
 				src/ft_setting_1.c \
 				src/ft_display_0.c \
 				src/ft_display_1.c \
 				src/ft_sort_0.c \
 				src/ft_sort_1.c \
+				src/ft_extra.c \
 				src/ft_ls.c
 
-OBJS    	=   $(SRCS:.c=.o)
+OBJS		=	$(SRCS:.c=.o)
 
-all:        $(NAME)
+all:		 	$(NAME)
 
-$(NAME):    $(OBJS)
-			Make -C ./lib/libft
-			$(CC) -o $(NAME) $(OBJS) $(LIB) $(CPPFLAGS)
+$(NAME):		$(OBJS)
+				Make -C ./lib/libft
+				$(CC) -o $(NAME) $(OBJS) $(LIB) $(CPPFLAGS)
 clean:
-			$(RM) $(OBJS)
-			Make -C ./lib/libft fclean
+				$(RM) $(OBJS)
+				Make -C ./lib/libft fclean
 
-fclean:		clean
-			$(RM) $(NAME)
+fclean:			clean
+				$(RM) $(NAME)
 
-re:			fclean all
+re:				fclean all
 
 push:
-			@git add .
-			@echo "Enter Your Commit :"
-			@read var1 ; git commit -m "$$var1"
-			@echo "Enter The origin :"
-			@read var2 ; git push origin "$$var2"
+				@git add .
+				@echo "Enter Your Commit :"
+				@read var1 ; git commit -m "$$var1"
+				@echo "Enter The origin :"
+				@read var2 ; git push origin "$$var2"
 
-.PHONY:		all clean fclean re push
+.PHONY:			all clean fclean re push

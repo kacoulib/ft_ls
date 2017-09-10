@@ -12,67 +12,45 @@
 
 #include "ft_ls.h"
 
-int			ft_display_folder(t_file *file, int l_len[])
+static int			ft_put_no_color(char *str, int type, char *link)
 {
-	while (file && ft_display_single(file, l_len))
-		file = file->next;
-	return (1);
-}
-
-int			ft_display_folder_files(t_file *folder, int l_len[])
-{
-	t_file	*tmp;
-	int		i;
-
-	tmp = folder;
-	i = 0;
-	while (tmp)
+	if (type == 10)
 	{
-		if (tmp->type != 4 && ++i)
-			ft_display_single(tmp, l_len);
-		tmp = tmp->next;
-	}
-	return (i);
-}
-
-int			ft_display_single(t_file *file, int l_len[])
-{
-	int		i;
-	char	*tmp;
-
-	if (ft_indexof(g_flags, 'l') > -1 && file->type != -1)
-	{
-		i = -1;
-		while (file->l[++i] && l_len[i])
+		ft_putstr(str);
+		if (link)
 		{
-			if (i == 4)
-				tmp = ft_padding(file->l[i],
-					(l_len[i] - ft_strlen(file->l[i])) + 1, 'r');
-			else
-				tmp = ft_padding(file->l[i],
-					(l_len[i] - ft_strlen(file->l[i])) + 1, 'l');
-			ft_putstr(ft_strjoin(tmp, " "));
+			ft_putstr(" -> ");
+			ft_putstr(link);
 		}
+		return (1);
 	}
-	ft_display_color(file);
+	ft_putstr(str);
 	return (1);
 }
 
-int			ft_display_color(t_file *file)
+int					ft_display_color(t_file *file)
 {
-	char	**tmp;
+	int				(*fn_display)(char *, int, char*);
+	char			tmp[256];
 
+	fn_display = ft_check_flag('G') ? &ft_putfile : &ft_put_no_color;
 	if (file->type == 10)
 	{
-		tmp = ft_strsplit(file->name, ' ');
-		ft_putfile(tmp[0], file->type, tmp[1]);
+		if (ft_check_flag('l'))
+		{
+			ft_bzero(tmp, 256);
+			readlink(file->path, tmp, 256);
+			fn_display(file->name, file->type, tmp);
+		}
+		else
+			fn_display(file->name, file->type, NULL);
 	}
 	else if ((file->sb->st_mode & S_IWOTH))
-		ft_putfile(file->name, 32, NULL);
+		fn_display(file->name, 32, NULL);
 	else if ((file->sb->st_mode & S_IXOTH) && file->type != 4)
-		ft_putfile(file->name, 16, NULL);
+		fn_display(file->name, 16, NULL);
 	else
-		ft_putfile(file->name, file->type, NULL);
+		fn_display(file->name, file->type, NULL);
 	ft_putchar('\n');
 	return (1);
 }

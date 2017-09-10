@@ -23,10 +23,10 @@ static int		ft_set_time(t_file *file)
 		return (0);
 	r = ft_strsplit(*r, ' ');
 	file->l[5] = r[1];
-	file->l[5] = ft_strjoin(file->l[5], " ");
+	file->l[5] = ft_strjoin(file->l[5], ft_strdup(" "));
 	file->l[5] = ft_strjoin(file->l[5],
 		ft_padding(r[2], (ft_strlen(r[2]) > 1 ? 0 : 1), 'r'));
-	file->l[5] = ft_strjoin(file->l[5], " ");
+	file->l[5] = ft_strjoin(file->l[5], ft_strdup(" "));
 	tmp = r;
 	if ((time(&curtime) - 15552000) > file->sb->st_mtime)
 		file->l[5] = ft_strjoin(file->l[5], ft_padding(tmp[4], 1, 'r'));
@@ -52,7 +52,7 @@ static int		ft_set_user_name(t_file *file, int long_params[],
 		&& (int)ft_strlen(file->l[1]) > long_params[1])
 		long_params[1] = ft_strlen(file->l[1]);
 	tmp = usr ? usr->pw_name : ft_itoa(file->sb->st_uid);
-	if ((file->l[2] = ft_strjoin(tmp, " ")) &&
+	if ((file->l[2] = ft_strjoin(tmp, ft_strdup(" "))) &&
 		(int)ft_strlen(file->l[2]) > long_params[2])
 		long_params[2] = ft_strlen(file->l[2]);
 	tmp = grp ? grp->gr_name : ft_itoa(file->sb->st_gid);
@@ -71,12 +71,10 @@ static int		ft_set_user_name(t_file *file, int long_params[],
 static int		ft_set_acl(t_file *file)
 {
 	mode_t		mode;
-	char		*r;
 	acl_t		facl;
 	acl_entry_t	ae;
 
 	mode = file->sb->st_mode;
-	r = ft_memalloc(101);
 	if (mode & (S_ISUID | S_ISGID))
 		file->l[0] = ft_strjoin(file->l[0],
 			mode & (S_IXUSR | S_IXGRP) ? "x" : "-");
@@ -86,14 +84,13 @@ static int		ft_set_acl(t_file *file)
 		file->l[0] = ft_strjoin(file->l[0], (mode & S_IXOTH) ? "x" : "-");
 	facl = acl_get_link_np(file->path, ACL_TYPE_EXTENDED);
 	if (facl && (acl_get_entry(facl, ACL_FIRST_ENTRY, &ae) == -1))
-		file->l[0] = ft_strjoin(file->l[0], " ");
+		file->l[0] = ft_strjoin(file->l[0], ft_strdup(" "));
 	else if (listxattr(file->path, NULL, 5, XATTR_NOFOLLOW) > 0)
 		file->l[0] = ft_strjoin(file->l[0], "@");
 	else if (facl != NULL)
 		file->l[0] = ft_strjoin(file->l[0], "+");
 	else
-		file->l[0] = ft_strjoin(file->l[0], " ");
-	free(r);
+		file->l[0] = ft_strjoin(file->l[0], ft_strdup(" "));
 	return (1);
 }
 
@@ -129,19 +126,11 @@ static int		ft_set_permissions(t_file *file, int l_len[],
 
 int				ft_set_extra_info(t_file *file, int long_params[])
 {
-	char		tmp[256];
 	int			i;
 
 	i = -1;
 	while (++i < 7)
 		file->l[i] = NULL;
-	if (file->type == 10)
-	{
-		ft_bzero(tmp, 256);
-		readlink(file->path, tmp, 256);
-		file->name = ft_strjoin(file->name, " ");
-		file->name = ft_strjoin(file->name, tmp);
-	}
 	if (file->parent)
 		file->parent->size += file->sb->st_blocks;
 	file->next = NULL;

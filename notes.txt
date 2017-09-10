@@ -1,0 +1,17 @@
+0.) Creer une struct master					---	Finished
+1.) Changer le main							---	Doing
+
+
+Maybe the ft_rev_list is not necessary
+
+struc line
+	number
+	list
+	next
+
+--------MASTER
+				- R0 	|	0 1 2
+				- R1 	| 	0 1 2
+				- R2 	| 	0 1 2
+				...
+--------MASTER

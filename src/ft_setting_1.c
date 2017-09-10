@@ -12,27 +12,14 @@
 
 #include "ft_ls.h"
 
-t_file			*ft_init_folder(char *name, t_file *parent, t_file *prev)
+int				ft_set_sb_and_long(t_file *file, int l_len[])
 {
-	t_file		*file;
-	struct stat	*sb;
-
-	file = (t_file *)malloc(sizeof(t_file) + 1);
-	sb = (struct stat*)malloc(sizeof(struct stat) + 1);
-	if (!file || !sb)
-		return (NULL);
-	file->name = (name) ? ft_strdup(name) : NULL;
-	file->path = NULL;
-	file->info = NULL;
-	file->size = 0;
-	file->type = 8;
-	file->sb = sb;
-	file->files = NULL;
-	file->parent = parent;
-	file->errors = NULL;
-	file->next = NULL;
-	file->prev = prev;
-	return (file);
+	if (stat(file->path, file->sb) == -1 &&
+		lstat(file->path, file->sb) == -1)
+		return (0);
+	if (ft_check_flag('l'))
+		ft_set_extra_info(file, l_len);
+	return (1);
 }
 
 char			*ft_padding(char *s, int offset, char direction)
@@ -45,6 +32,7 @@ char			*ft_padding(char *s, int offset, char direction)
 	i = (ft_strlen(s) + offset);
 	if (!(tmp = (char *)malloc((sizeof(char) * i))))
 		return (0);
+	ft_bzero(tmp, i);
 	ft_memset(tmp, ' ', (i - 1));
 	s = ft_strtrim(s);
 	if (direction == 'l' && (i = -1) == -1)
@@ -79,14 +67,15 @@ int				ft_set_error(t_file *file, char *s, char *err)
 
 	if (!file || !(tmp = ft_init_folder("ft_ls: ", file, NULL)))
 		return (0);
-	tmp->name = ft_strdup("ft_ls: ");
+	if (!(tmp->name = ft_strdup("ft_ls: ")))
+		return (-1);
 	if (err && ft_strcmp(err, "wrong flag") == 0)
 	{
-		tmp->name = ft_strjoin(tmp->name, "illegal option -- ");
-		tmp->name = ft_strjoin(tmp->name, s);
-		tmp->name = ft_strjoin(tmp->name, "\nusage: ft_ls [");
-		tmp->name = ft_strjoin(tmp->name, g_flags);
-		tmp->name = ft_strjoin(tmp->name, "] [file ...]");
+		tmp->name = ft_freejoin(tmp->name, "illegal option -- ");
+		tmp->name = ft_freejoin(tmp->name, s);
+		tmp->name = ft_freejoin(tmp->name, "\nusage: ft_ls [");
+		tmp->name = ft_freejoin(tmp->name, ft_get_or_create_master()->flags);
+		tmp->name = ft_freejoin(tmp->name, "] [file ...]");
 	}
 	else
 	{
@@ -101,30 +90,30 @@ int				ft_set_error(t_file *file, char *s, char *err)
 	return ((tmp->type = -1));
 }
 
-int				ft_set_params(t_file *file, char **av, int i)
+int				ft_set_flags(t_master *master, t_file *file, char **av, int i)
 {
 	int			j;
 	int			k;
-	char		r[ft_strlen(g_flags)];
+	char		r[ft_strlen(master->flags)];
 
 	j = 0;
 	k = -1;
-	ft_memset(r, '\0', ft_strlen(g_flags));
+	ft_memset(r, '\0', ft_strlen(r));
 	while (av[++i] && av[i][0] == '-' && av[i][1])
 	{
 		while (av[i][++j] != '\0')
 		{
-			if (ft_indexof(g_flags, av[i][j]) < 0 || av[i][j] == '-')
+			if (!ft_check_flag(av[i][j]) || av[i][j] == '-')
 			{
 				ft_set_error(file, ft_strsub(av[i], j, 1), "wrong flag");
 				return (-1);
 			}
-			if (ft_indexof(g_flags, av[i][j]) >= 0)
+			if (ft_check_flag(av[i][j]))
 				if (ft_indexof(r, av[i][j]) < 0)
 					r[++k] = av[i][j];
 		}
 		j = 0;
 	}
-	g_flags = ft_strdup(r);
+	master->flags = ft_strdup(r);
 	return (i);
 }
