@@ -63,7 +63,7 @@ t_master			*ft_init_master(int *ac, char **av, t_file *tmp_master,
 	i = 0;
 	if (!(master = ft_get_or_create_master()))
 		return (NULL);
-	master->flags = ft_strdup("alRrtuG");
+	master->flags = ft_strdup("alRrtGS");
 	master->errors = ft_init_folder(NULL, NULL, NULL);
 	if (*ac < 1 || (i = ft_set_flags(master, tmp_master, av, 0)) < -1)
 		return (NULL);

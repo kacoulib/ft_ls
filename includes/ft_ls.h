@@ -78,7 +78,6 @@ int					set_parse_params(t_file *master, char **av,
 	int l_len[], int i);
 int					ft_set_sb_and_long(t_file *file, int l_len[]);
 int					ft_sort_settings(t_file **file);
-int					ft_sort_by_last_modify(t_file **file);
 int					ft_sort_lexico(t_file **file);
 int					ft_swap_file(t_file **file, t_file *current,
 	t_file *tmp);

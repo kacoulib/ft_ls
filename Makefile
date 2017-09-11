@@ -23,7 +23,6 @@ SRCS		=	src/ft_init.c \
 				src/ft_display_1.c \
 				src/ft_sort_0.c \
 				src/ft_sort_1.c \
-				src/ft_extra.c \
 				src/ft_ls.c
 
 OBJS		=	$(SRCS:.c=.o)

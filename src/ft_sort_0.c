@@ -12,24 +12,34 @@
 
 #include "ft_ls.h"
 
-int			ft_rev_file(t_file **file)
+static int	ft_sort_by_size(t_file **file)
 {
-	t_file	*prev;
+	t_file	*current;
 	t_file	*tmp;
 
-	prev = NULL;
-	while (*file)
+	current = (*file);
+	tmp = (*file);
+	while (current->next)
 	{
-		tmp = (*file);
-		*file = (*file)->next;
-		tmp->next = prev;
-		prev = tmp;
+		if (current->sb->st_size < current->next->sb->st_size)
+		{
+			current = current->next;
+			while (tmp->next)
+			{
+				if (current->sb->st_size > tmp->sb->st_size)
+				{
+					ft_swap_file(file, current, tmp);
+					return (ft_sort_by_size(file));
+				}
+				tmp = tmp->next;
+			}
+		}
+		current = current->next;
 	}
-	*file = tmp;
-	return (0);
+	return (1);
 }
 
-int			ft_sort_by_last_modify(t_file **file)
+static int	ft_sort_by_last_modify(t_file **file)
 {
 	t_file	*current;
 	t_file	*tmp;
@@ -89,6 +99,8 @@ int			ft_sort_settings(t_file **folder)
 		return (0);
 	if (ft_check_flag('t'))
 		ft_sort_by_last_modify(folder);
+	else if (ft_check_flag('S'))
+		ft_sort_by_size(folder);
 	else
 		ft_sort_lexico(folder);
 	if (ft_check_flag('r'))
@@ -100,21 +112,5 @@ int			ft_sort_settings(t_file **folder)
 			ft_sort_settings(&tmp->files);
 		tmp = tmp->next;
 	}
-	return (1);
-}
-
-int			ft_swap_file(t_file **file, t_file *current, t_file *head)
-{
-	if (current->prev)
-		current->prev->next = current->next;
-	if (current->next)
-		current->next->prev = current->prev;
-	if (head->prev)
-		head->prev->next = current;
-	current->prev = head->prev;
-	head->prev = current;
-	current->next = head;
-	if (head == (*file))
-		(*file) = current;
 	return (1);
 }

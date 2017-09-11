@@ -14,8 +14,8 @@
 
 int				ft_set_sb_and_long(t_file *file, int l_len[])
 {
-	if (stat(file->path, file->sb) == -1 &&
-		lstat(file->path, file->sb) == -1)
+	if (lstat(file->path, file->sb) == -1 &&
+		stat(file->path, file->sb) == -1)
 		return (0);
 	if (ft_check_flag('l'))
 		ft_set_extra_info(file, l_len);
